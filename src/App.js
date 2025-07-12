@@ -8,6 +8,14 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, signInAnonymously, onAuthStateChanged } from 'firebase/auth';
 import { getFirestore, doc, onSnapshot, setDoc, updateDoc, collection, addDoc, serverTimestamp, getDocs, query, orderBy, limit, deleteDoc, getDoc, Timestamp, where } from 'firebase/firestore';
 
+import { auth } from './firebase';
+import { signInAnonymously } from 'firebase/auth';
+
+signInAnonymously(auth)
+  .catch(error => {
+    console.error('Error signing in anonymously:', error.code);  
+    // Show user-friendly message here
+
 const firebaseConfig = {
   apiKey: "AIzaSyAbwKVJLPVAJDV6W4n61N6Aczh9bNmX964",
   authDomain: "nbhwc-study-platform.firebaseapp.com",
