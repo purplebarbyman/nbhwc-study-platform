@@ -1,16 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { BookOpen, Target, BrainCircuit, ShieldCheck, BarChart2, Star, Clock, Calendar, Users, Award, Flame, TrendingUp, Settings, Lightbulb, XCircle, CheckCircle, ArrowRight, Zap, BookCopy, TestTube2, Trophy, HelpCircle, ArrowLeft, Video, Gamepad2, ChevronsRight, Baby, Loader2, Flag, Send, Crown, Sparkles, User, Bell, Download, AlertTriangle, Brain, Repeat, Wand2, LineChart, Coffee, Heart } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import app, { auth, db } from './firebase';
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAbwKVJLPVAJDV6W4n61N6Aczh9bNmX964",
-  authDomain: "nbhwc-study-platform.firebaseapp.com",
-  projectId: "nbhwc-study-platform",
-  storageBucket: "nbhwc-study-platform.firebasestorage.app",
-  messagingSenderId: "579374591514",
-  appId: "1:579374591514:web:a26baa11f7e343d9ceaba3",
-  measurementId: "G-Z7HWYEFM2K"
-};
 
 // --- STATIC CONTENT (remains in code) ---
 const allMockQuestions = [ { id: 'q1', question: "Which of the following is a core component of Motivational Interviewing?", options: ["Giving direct advice", "Expressing empathy", "Challenging the client's beliefs", "Setting goals for the client"], correctAnswer: "Expressing empathy", explanation: "Expressing empathy is a foundational skill in Motivational Interviewing (MI), as it helps build rapport and understanding.", source: "NBHWC Content Outline, II.A.2" }, { id: 'q2', question: "A client says, 'I want to eat healthier, but I have no time.' This is an example of:", options: ["Change talk", "Sustain talk", "Ambivalence", "A specific goal"], correctAnswer: "Ambivalence", explanation: "Ambivalence is the state of having mixed feelings. The client expresses a desire to change alongside a reason not to.", source: "NBHWC Coaching Competencies, B.3" }, { id: 'q3', question: "What is the primary purpose of 'powerful questioning' in coaching?", options: ["To gather information for the coach", "To test the client's knowledge", "To guide the client to a specific conclusion", "To evoke discovery and insight for the client"], correctAnswer: "To evoke discovery and insight for the client", explanation: "Powerful questions are open-ended and designed to help clients access their own inner wisdom.", source: "ICF Core Competencies" }, { id: 'q4', question: "The 'OARS' acronym in Motivational Interviewing stands for:", options: ["Observe, Ask, Reflect, Summarize", "Open Questions, Affirmations, Reflections, Summaries", "Objectives, Actions, Results, Sustainment", "Observe, Act, Review, Support"], correctAnswer: "Open Questions, Affirmations, Reflections, Summaries", explanation: "OARS represents the basic interaction techniques and skills used in MI.", source: "Miller & Rollnick, 'Motivational Interviewing, 3rd Ed.'" }, { id: 'q5', question: "Which type of reflection is best used to gently challenge a client's perspective?", options: ["Simple Reflection", "Amplified Reflection", "Double-Sided Reflection", "Feeling Reflection"], correctAnswer: "Amplified Reflection", explanation: "Amplified reflections overstate what the client has said, which can encourage the client to argue less for the status quo.", source: "NBHWC Content Outline, II.A.3" }, { id: 'q6', question: "In the context of coaching agreements, what does 'scope of practice' primarily refer to?", options: ["The number of sessions a coach can provide", "The geographical area where the coach can practice", "The specific services a coach is qualified and insured to provide", "The types of goals a coach is allowed to work on"], correctAnswer: "The specific services a coach is qualified and insured to provide", explanation: "Scope of practice defines the boundaries of a professional's role, ensuring they do not provide services (like medical advice or therapy) for which they are not qualified.", source: "NBHWC Ethical Guidelines" }, { id: 'q7', question: "A coach saying 'You've handled similar challenges successfully before' is an example of:", options: ["A powerful question", "An affirmation", "A summary", "A simple reflection"], correctAnswer: "An affirmation", explanation: "Affirmations are statements that recognize a client's strengths, efforts, and past successes, which helps build self-efficacy.", source: "NBHWC Coaching Competencies, B.2" }, { id: 'q8', question: "What is the 'righting reflex' that coaches are trained to resist?", options: ["The urge to correct a client's factual errors", "The tendency to immediately offer solutions or advice", "The reflex to end the session on a positive note", "The need to write down every detail the client says"], correctAnswer: "The tendency to immediately offer solutions or advice", explanation: "The righting reflex is the natural desire to 'fix' a problem for someone, which can be counterproductive in coaching as it undermines the client's autonomy.", source: "Miller & Rollnick, 'Motivational Interviewing, 3rd Ed.'" }, { id: 'q9', question: "Which of the following is NOT a defined NBHWC domain?", options: ["Coaching Structure", "Health & Wellness", "Business Development", "Coaching Process"], correctAnswer: "Business Development", explanation: "While important for a coaching practice, Business Development is not one of the four core domains tested on the NBHWC exam.", source: "NBHWC Exam Content Outline" }, { id: 'q10', question: "The 'S' in SMART goals stands for:", options: ["Simple", "Specific", "Strategic", "Sustainable"], correctAnswer: "Specific", explanation: "SMART goals are Specific, Measurable, Achievable, Relevant, and Time-bound. 'Specific' ensures the goal is well-defined and clear.", source: "Widely used goal-setting theory" }, { id: 'q11', question: "What is the primary purpose of a coaching agreement?", options: ["To guarantee client results", "To set clear expectations and boundaries for the coaching relationship", "To serve as a marketing tool", "To provide a summary of the client's health history"], correctAnswer: "To set clear expectations and boundaries for the coaching relationship", explanation: "The coaching agreement clarifies roles, responsibilities, confidentiality, and logistics to create a safe and professional container for the coaching.", source: "NBHWC Ethical Guidelines, Section 2" }, { id: 'q12', question: "A client consistently arrives late to sessions. What is the most appropriate first step for the coach?", options: ["Charge the client for the missed time", "Ignore it to avoid conflict", "Refer the client to a time management specialist", "Address the pattern with the client in a non-judgmental way"], correctAnswer: "Address the pattern with the client in a non-judgmental way", explanation: "The first step is to open a direct, non-judgmental dialogue to understand the reason for the lateness and co-create a solution, reinforcing the coaching agreement.", source: "Coaching professional standards" } ];
@@ -58,4 +48,27 @@ export default function App() {
   const [levelUpInfo, setLevelUpInfo] = useState(null);
   const [appSettings, setAppSettings] = useState({ showNotifications: true });
   const [srsQuiz, setSrsQuiz] = useState(null);
-};
+  …
+
+  import React, { useState, useEffect } from 'react';
+import app, { auth, db } from './firebase';
+
+export default function App() {
+  const [firebaseReady, setFirebaseReady] = useState(false);
+
+  useEffect(() => {
+    // If you need to set userId or fetch profile, do it here.
+    setFirebaseReady(true);
+  }, []);
+
+  if (!firebaseReady) {
+    return <p style={{textAlign:'center',marginTop:20}}>Loading…</p>;
+  }
+
+  return (
+    <div className="App">
+      <h1>Your NBHWC Study Platform</h1>
+      {/* Render your Dashboard or viewState logic here */}
+    </div>
+  );
+  }
