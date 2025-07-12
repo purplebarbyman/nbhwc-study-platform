@@ -5,7 +5,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsive
 
 // Firebase Imports
 import { initializeApp } from 'firebase/app';
-import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from 'firebase/auth';
+import { getAuth, signInAnonymously, onAuthStateChanged } from 'firebase/auth';
 import { getFirestore, doc, onSnapshot, setDoc, updateDoc, collection, addDoc, serverTimestamp, getDocs, query, orderBy, limit, deleteDoc, getDoc, Timestamp, where } from 'firebase/firestore';
 
 // --- STATIC CONTENT (remains in code) ---
@@ -56,38 +56,42 @@ export default function App() {
   const [srsQuiz, setSrsQuiz] = useState(null);
 
   useEffect(() => {
-    const envFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+    const firebaseConfig = {
+      apiKey: process.env.REACT_APP_API_KEY,
+      authDomain: process.env.REACT_APP_AUTH_DOMAIN,
+      projectId: process.env.REACT_APP_PROJECT_ID,
+      storageBucket: process.env.REACT_APP_STORAGE_BUCKET,
+      messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
+      appId: process.env.REACT_APP_APP_ID,
+      measurementId: process.env.REACT_APP_MEASUREMENT_ID
+    };
     
-    if (!envFirebaseConfig) {
-        console.error("Firebase config not found from environment. This is expected in local development. Ensure you have set up your .env.local file.");
+    if (!firebaseConfig.apiKey) {
+        console.error("Firebase config not found. Make sure you have set up your .env file with REACT_APP_... variables.");
         alert("This application is not configured to connect to a database. Please contact the administrator.");
         return;
     }
 
-    const app = initializeApp(envFirebaseConfig);
+    const app = initializeApp(firebaseConfig);
     const authInstance = getAuth(app);
     const dbInstance = getFirestore(app);
     setAuth(authInstance);
     setDb(dbInstance);
 
     const unsubscribe = onAuthStateChanged(authInstance, async (user) => {
-      if (user) { setUserId(user.uid); } else {
+      if (user) { 
+        setUserId(user.uid); 
+      } else {
         try {
-            const authToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-            if (authToken) {
-                await signInWithCustomToken(authInstance, authToken);
-            } else {
-                await signInAnonymously(authInstance);
-            }
-        } catch (error) { console.error("Error signing in:", error); }
+            await signInAnonymously(authInstance);
+        } catch (error) { console.error("Error signing in anonymously:", error); }
       }
     });
     return () => unsubscribe();
   }, []);
 
   const updateLeaderboardProfile = async (db, userId, data) => {
-      const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-      const leaderboardDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'leaderboard', userId);
+      const leaderboardDocRef = doc(db, 'leaderboard', userId);
       try {
           await setDoc(leaderboardDocRef, {
               name: data.name,
@@ -105,8 +109,7 @@ export default function App() {
 
   useEffect(() => {
     if (!db || !userId) return;
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-    const docRef = doc(db, 'artifacts', appId, 'users', userId, 'profile', 'data');
+    const docRef = doc(db, 'users', userId);
     const unsubscribe = onSnapshot(docRef, async (snapshot) => {
       if (snapshot.exists()) { 
           const data = snapshot.data();
@@ -130,8 +133,7 @@ export default function App() {
 
   const handleAnswer = async (questionId, isCorrect) => {
       if (!db || !userId) return;
-      const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-      const historyRef = doc(db, 'artifacts', appId, 'users', userId, 'question_history', questionId);
+      const historyRef = doc(db, `users/${userId}/question_history`, questionId);
       
       try {
           const docSnap = await getDoc(historyRef);
@@ -184,8 +186,7 @@ export default function App() {
           }
       }
       
-      const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-      const docRef = doc(db, 'artifacts', appId, 'users', userId, 'profile', 'data');
+      const docRef = doc(db, 'users', userId);
       
       try {
         await updateDoc(docRef, {
@@ -205,8 +206,7 @@ export default function App() {
   const handleGeneratePlan = async (plan) => {
       if (!db || !userId) { setShowTimelineModal(false); return; }
       if (plan === null) { setShowTimelineModal(false); return; }
-      const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-      const docRef = doc(db, 'artifacts', appId, 'users', userId, 'profile', 'data');
+      const docRef = doc(db, 'users', userId);
       try { await updateDoc(docRef, { todaysPlan: plan }); } catch(e) { console.error("Error updating study plan:", e); }
       setShowTimelineModal(false);
   };
@@ -214,25 +214,22 @@ export default function App() {
   const handleTogglePlanItem = async (itemIndex) => {
     if (!db || !userId || !userData) return;
     const newPlan = userData.todaysPlan.map((item, index) => { if (index === itemIndex) { return { ...item, completed: !item.completed }; } return item; });
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-    const docRef = doc(db, 'artifacts', appId, 'users', userId, 'profile', 'data');
+    const docRef = doc(db, 'users', userId);
     try { await updateDoc(docRef, { todaysPlan: newPlan }); } catch (e) { console.error("Error toggling plan item:", e); }
   };
 
   const handleUpdateName = async (newName) => {
     if (!db || !userId) return;
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-    const docRef = doc(db, 'artifacts', appId, 'users', userId, 'profile', 'data');
+    const docRef = doc(db, 'users', userId);
     try { await updateDoc(docRef, { name: newName }); alert("Name updated successfully!"); } catch(e) { console.error("Error updating name:", e); alert("Failed to update name."); }
   };
 
   const handleResetAccount = async () => {
     if (!db || !userId) return;
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-    const docRef = doc(db, 'artifacts', appId, 'users', userId, 'profile', 'data');
+    const docRef = doc(db, 'users', userId);
     try {
         await setDoc(docRef, getDefaultUserData());
-        const historyCol = collection(db, 'artifacts', appId, 'users', userId, 'question_history');
+        const historyCol = collection(db, `users/${userId}/question_history`);
         const snapshot = await getDocs(historyCol);
         snapshot.docs.forEach(doc => deleteDoc(doc.ref));
         alert("Your account has been reset.");
@@ -245,8 +242,7 @@ export default function App() {
 
   const handleStartSmartReview = async () => {
       if (!db || !userId) return;
-      const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-      const historyCol = collection(db, 'artifacts', appId, 'users', userId, 'question_history');
+      const historyCol = collection(db, `users/${userId}/question_history`);
       const now = Timestamp.now();
       
       const q = query(historyCol, where("nextReview", "<=", now), orderBy("nextReview"), limit(10));
