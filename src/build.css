@@ -1,0 +1,5 @@
+.test-tailwind {
+  background-color: #ef4444; /* Tailwind bg-red-500 */
+  color: #fff; /* Tailwind text-white */
+  padding: 1rem; /* Tailwind p-4 */
+}
