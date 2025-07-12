@@ -2,7 +2,6 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
-// Step 3: Firebase Configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAbwKVJLPVAJDV6W4n61N6Aczh9bNmX964",
   authDomain: "nbhwc-study-platform.firebaseapp.com",
@@ -13,16 +12,14 @@ const firebaseConfig = {
   measurementId: "G-Z7HWYEFM2K"
 };
 
-// Step 4: Error Handling
-const requiredKeys = ['apiKey', 'authDomain', 'projectId', 'storageBucket', 'messagingSenderId', 'appId'];
-const missingKeys = requiredKeys.filter(key => !firebaseConfig[key]);
-
-if (missingKeys.length > 0) {
+const requiredKeys = ['apiKey','authDomain','projectId','storageBucket','messagingSenderId','appId'];
+const missingKeys = requiredKeys.filter(k => !firebaseConfig[k]);
+if (missingKeys.length) {
   throw new Error(`Firebase config missing: ${missingKeys.join(', ')}`);
 }
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export default app;
+
