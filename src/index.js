@@ -12,8 +12,14 @@ root.render(
   </React.StrictMode>
 );
 
-// ...existing code...
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
+
+"devDependencies": {
+  "tailwindcss": "^4.1.11",
+  "autoprefixer": "^10.4.21",
+  "postcss": "^8.5.6",
+  "postcss-cli": "^11.0.1"
+}
